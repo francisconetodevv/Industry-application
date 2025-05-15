@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"html/template"
 	"industrialApplication/server"
 	"log"
 	"net/http"
@@ -12,6 +13,18 @@ import (
 func main() {
 	// This lib is responsible to create the routers that allows to navigate and sent the data
 	router := mux.NewRouter()
+
+	/*
+		The next step is creat a template.ExecuteTemplate() to render the webPage to connect with this router "/createMachine"
+	*/
+
+	templates := template.Must(template.ParseGlob("static/html/index.html"))
+	router.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
+		err := templates.ExecuteTemplate(w, "index.html", nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}).Methods(http.MethodGet)
 
 	// Routers
 	router.HandleFunc("/createMachine", server.CreateMachine).Methods(http.MethodPost)

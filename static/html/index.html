@@ -1,0 +1,55 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Cadastrar Máquina</title>
+</head>
+<body>
+  <h1>Cadastro de Máquina</h1>
+
+  <form id="machineForm">
+    <label for="machine">Machine:</label>
+    <input type="text" id="machine" name="machine"><br><br>
+
+    <label for="brand">Marca:</label>
+    <input type="text" id="brand" name="brand"><br><br>
+
+    <label for="description">Descrição:</label>
+    <input type="text" id="description" name="description"><br><br>
+
+    <label for="serial_number">ID Máquina:</label>
+    <input type="number" id="serial_number" name="serial_number"><br><br>
+
+    <label for="installation_location">Local na Fábrica:</label>
+    <input type="text" id="installation_location" name="installation_location"><br><br>
+
+    <button type="submit">Enviar</button>
+  </form>
+
+  <script>
+    document.getElementById("machineForm").addEventListener("submit", async function (e) {
+      e.preventDefault(); // Impede o recarregamento da página
+
+      const data = {
+        name: document.getElementById("machine").value,
+        brand: document.getElementById("brand").value,
+        description: document.getElementById("description").value,
+        serial_number: Number(document.getElementById("serial_number").value),
+        installation_location: document.getElementById("installation_location").value
+      };
+
+      const response = await fetch("/createMachine", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json"
+        },
+        body: JSON.stringify(data)
+      });
+
+      const result = await response.text();
+      alert(result); // Mostra a resposta do servidor
+    });
+  </script>
+</body>
+</html>

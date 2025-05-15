@@ -37,7 +37,7 @@ func CreateMachine(w http.ResponseWriter, r *http.Request) {
 		r: *http.Request
 		- A pointer to a struct that contains everything about the HTTP request.
 		- It includes:
-			• Method (GET, POST, etc.)
+			 • Method (GET, POST, etc.)
 			• Headers (ex: Content-Type)
 			• URL parameters and query strings
 			• Body (data sent by the client, usually in JSON)
