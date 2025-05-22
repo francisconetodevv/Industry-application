@@ -6,6 +6,9 @@ import (
 	"industrialApplication/database"
 	"io/ioutil"
 	"net/http"
+	"strconv"
+
+	"github.com/gorilla/mux"
 )
 
 /*
@@ -157,4 +160,57 @@ func CreateMachine(w http.ResponseWriter, r *http.Request) {
 	w.Write([]byte(fmt.Sprintf("Usuário inserido com sucesso! ID: %d", idInsert)))
 	fmt.Println("Usuario criado com sucesso...")
 
+}
+
+// PUT
+func UpdateMachine(w http.ResponseWriter, r *http.Request) {
+	/*
+		Mux it is a golang package that is responsible for routing Http. It allows to define the routes with params, middlewares
+		and others advanced functionalities.
+
+		The mux.Vars(r) is used to extract variables from the router defined.
+	*/
+	params := mux.Vars(r)
+
+	ID, erro := strconv.ParseUint(params["id"], 10, 32)
+	if erro != nil {
+		w.Write([]byte("Erro ao ler corpo da requisição"))
+		return
+	}
+
+	bodyRequest, erro := ioutil.ReadAll(r.Body)
+	if erro != nil {
+		w.Write([]byte("Erro ao ler corpo da requisição"))
+		return
+	}
+
+	var machine machines
+	if erro := json.Unmarshal(bodyRequest, &machine); erro != nil {
+		w.Write([]byte("Erro ao converter o usuário para struct"))
+		return
+	}
+
+	db, erro := database.Connection()
+	if erro != nil {
+		w.Write([]byte("Erro ao conectar ao banco de dados"))
+		return
+	}
+
+	defer db.Close()
+
+	statement, erro := db.Prepare("update machines set name = ?, brand = ?, description = ?, serial_number = ?, installation_location = ?")
+	fmt.Println(statement)
+	if erro != nil {
+		w.Write([]byte("Erro ao preparar statement"))
+		return
+	}
+
+	defer statement.Close()
+
+	if _, erro := statement.Exec(machine.Name, machine.Brand, machine.Description, machine.Serial_number, machine.Installation_location, ID); erro != nil {
+		w.Write([]byte("Erro ao atualizar o usuário"))
+		return
+	}
+
+	w.WriteHeader(http.StatusNoContent)
 }
