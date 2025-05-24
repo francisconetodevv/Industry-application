@@ -62,7 +62,7 @@ func CreateMachine(w http.ResponseWriter, r *http.Request) {
 		- This ensures concurrent safety and keeps handlers stateless and modular.
 	*/
 
-	fmt.Println("Creating the user...")
+	fmt.Println("Creating machine on database...")
 
 	/*
 		r.Body:

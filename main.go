@@ -10,24 +10,44 @@ import (
 	"github.com/gorilla/mux"
 )
 
+func renderTemplate(templateName string, templates *template.Template) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		err := templates.ExecuteTemplate(w, templateName, nil)
+		if err != nil {
+			http.Error(w, err.Error(), http.StatusInternalServerError)
+		}
+	}
+}
+
 func main() {
 	// This lib is responsible to create the routers that allows to navigate and sent the data
 	router := mux.NewRouter()
 
 	/*
-		The next step is creat a template.ExecuteTemplate() to render the webPage to connect with this router "/createMachine"
+		The next step is creat a template.ExecuteTemplate() to render the webPage to connect with the routers.
+		If I pass *.html, the code will read all the files that use the extension .html
 	*/
 
-	templates := template.Must(template.ParseGlob("static/html/index.html"))
-	router.HandleFunc("/home", func(w http.ResponseWriter, r *http.Request) {
-		err := templates.ExecuteTemplate(w, "index.html", nil)
-		if err != nil {
-			http.Error(w, err.Error(), http.StatusInternalServerError)
-		}
-	}).Methods(http.MethodGet)
+	templates := template.Must(template.ParseGlob("static/html/*.html"))
+
+	/*
+
+		I have transformed this func in the next code - renderTemplate
+
+		router.HandleFunc("/CreateMachine", func(w http.ResponseWriter, r *http.Request) {
+			err := templates.ExecuteTemplate(w, "CreateMachine.html", nil)
+			if err != nil {
+				http.Error(w, err.Error(), http.StatusInternalServerError)
+			}
+		}).Methods(http.MethodGet)
+
+		router.HandleFunc("/CreateMachine", server.CreateMachine).Methods(http.MethodPost)
+
+	*/
 
 	// Routers
-	router.HandleFunc("/createMachine", server.CreateMachine).Methods(http.MethodPost)
+	router.HandleFunc("/CreateMachine", server.CreateMachine).Methods(http.MethodGet)
+	router.HandleFunc("/UpdateMachine", renderTemplate("UpdateMachine.html", templates)).Methods(http.MethodPut)
 
 	/*
 	   log.Fatal is a function from the log package that prints a log message
